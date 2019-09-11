@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     Copyright (C) 2013 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/top"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:visibility="visible"
+    android:paddingStart="20dp">
+
+    <FrameLayout
+        android:id="@+id/editorContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6">
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/clearButton"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:text="@string/draw_clear"
+                android:visibility="visible"
+                android:textColor="@color/white"
+                android:background="@color/transparent"/>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="5dp"
+                android:columnCount="2"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/controlName1"
+                    android:layout_gravity="left"
+                    android:text="@string/draw_size"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/drawSizeValue"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="8dip"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <SeekBar
+                    android:id="@+id/drawSizeSeekBar"
+                    style="@style/FilterShowSlider"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_column="0"
+                    android:layout_columnSpan="2"
+                    android:layout_gravity="fill_horizontal"
+                    android:progress="20" />
+            </GridLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/draw_style"
+                android:textColor="@color/white"
+                android:layout_marginTop="5dp"/>
+
+            <HorizontalScrollView
+                android:id="@+id/scrollList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:id="@+id/listStyles"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+            </HorizontalScrollView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/draw_color"
+                android:textColor="@color/white"
+                android:layout_marginTop="5dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+
+                <LinearLayout
+                    android:id="@+id/listColors"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/draw_color_button01"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_marginRight="4dp"
+                        android:background="@drawable/filtershow_color_picker_circle" />
+
+                    <Button
+                        android:id="@+id/draw_color_button02"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_marginRight="4dp"
+                        android:background="@drawable/filtershow_color_picker_circle" />
+
+                    <Button
+                        android:id="@+id/draw_color_button03"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_marginRight="4dp"
+                        android:background="@drawable/filtershow_color_picker_circle" />
+
+                    <Button
+                        android:id="@+id/draw_color_button04"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_marginRight="4dp"
+                        android:background="@drawable/filtershow_color_picker_circle" />
+
+                    <Button
+                        android:id="@+id/draw_color_button05"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_marginRight="4dp"
+                        android:background="@drawable/filtershow_color_picker_circle" />
+                    <Button
+                        android:id="@+id/draw_color_popupbutton"
+                        android:layout_width="@dimen/deaw_color_picker_button_size"
+                        android:layout_height="@dimen/deaw_color_picker_button_size"
+                        android:layout_gravity="center"
+                        android:background="@drawable/filtershow_color_popubutton" />
+
+                </LinearLayout>
+
+                <!--<FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/background_main_toolbar">
+
+                    <Button
+                        android:id="@+id/draw_color_popupbutton"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_action_overflow" />
+                </FrameLayout>-->
+                <!--@drawable/ic_action_overflow
+                @android:drawable/ic_menu_more-->
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/colorPicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dip"
+                android:text="@string/draw_color"
+                android:visibility="gone" />
+
+            <com.android.gallery3d.filtershow.colorpicker.ColorCompareView
+                android:id="@+id/btnSelect"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="18dp"
+                android:layout_marginTop="0dp" />
+
+            <com.android.gallery3d.filtershow.colorpicker.ColorSVRectView
+                android:id="@+id/colorRectView"
+                android:layout_width="@dimen/draw_ui_width"
+                android:layout_height="@dimen/draw_ui_width"
+                android:layout_gravity="center"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="2dp" />
+
+            <com.android.gallery3d.filtershow.colorpicker.ColorHueView
+                android:id="@+id/ColorHueView"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:layout_marginTop="0dp" />
+
+            <com.android.gallery3d.filtershow.colorpicker.ColorOpacityView
+                android:id="@+id/colorOpacityView"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:layout_marginTop="0dp" />
+
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="0dp">
+                <Button
+                    android:id="@+id/cancelColorPick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left|center_vertical"
+                    android:background="@android:color/transparent"
+                    android:layout_weight=".1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="@string/cancel"/>
+
+                <ImageView
+                    android:layout_width="2dp"
+                    android:layout_height="fill_parent"
+                    android:src="@drawable/filtershow_vertical_bar"/>
+                <Button
+                    android:id="@+id/applyColorPick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_weight=".1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="@string/ok"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

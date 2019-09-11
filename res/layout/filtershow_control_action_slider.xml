@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     Copyright (C) 2013 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.example.imagefilterharness"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/actionCloseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/filtershow_button_background"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_list_close_rest" />
+
+        <SeekBar
+            android:id="@+id/controlValueSeekBar"
+            style="@style/FilterShowSlider"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/actionCheckButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:background="@drawable/filtershow_button_background"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_list_check_rest" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/leftActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/filtershow_button_background"
+            android:paddingBottom="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/filtershow_addpoint" />
+
+        <TextView
+            android:id="@+id/bottomActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/rightActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/filtershow_button_background"
+            android:paddingBottom="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_menu_trash_holo_light" />
+    </RelativeLayout>
+</LinearLayout>
+

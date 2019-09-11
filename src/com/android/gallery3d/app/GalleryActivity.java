@@ -1,0 +1,434 @@
+/*
+ * Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.android.gallery3d.app;
+
+import android.Manifest;
+import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Toast;
+
+import com.android.gallery3d.R;
+import com.android.gallery3d.common.Utils;
+import com.android.gallery3d.data.DataManager;
+import com.android.gallery3d.data.MediaItem;
+import com.android.gallery3d.data.MediaSet;
+import com.android.gallery3d.data.Path;
+import com.android.gallery3d.picasasource.PicasaSource;
+import com.android.gallery3d.util.GalleryUtils;
+import com.android.gallery3d.util.Logger;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public final class GalleryActivity extends AbstractGalleryActivity implements OnCancelListener {
+    public static final String EXTRA_SLIDESHOW = "slideshow";
+    public static final String EXTRA_DREAM = "dream";
+    public static final String EXTRA_CROP = "crop";
+
+    public static final String ACTION_REVIEW = "com.android.camera.action.REVIEW";
+    public static final String KEY_GET_CONTENT = "get-content";
+    public static final String KEY_GET_ALBUM = "get-album";
+    public static final String KEY_TYPE_BITS = "type-bits";
+    public static final String KEY_MEDIA_TYPES = "mediaTypes";
+    public static final String KEY_DISMISS_KEYGUARD = "dismiss-keyguard";
+    public static final String KEY_FROM_SNAPCAM = "from-snapcam";
+    public static final String KEY_TOTAL_NUMBER = "total-number";
+
+    //add for TimelinePage and PhotoPage: -1 don't show timeline title, 0 show timeline title
+    public static final int CLUSTER_ALBUMSET_NO_TITLE = -1;
+    public static final int CLUSTER_ALBUMSET_TIME_TITLE = 0;
+
+    private static final String TAG = "GalleryActivity";
+    private static final int PERMISSION_REQUEST = 1;
+    private Dialog mVersionCheckDialog;
+    private Bundle mSavedInstanceState;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+
+        //step FULL SCREEN
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        if (getIntent().getBooleanExtra(KEY_DISMISS_KEYGUARD, false)) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        }
+
+        //step translucent status
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getColor(R.color.status_bar_color));
+        }
+
+        setContentView(R.layout.main);
+
+//        if (savedInstanceState != null) {
+//            getStateManager().restoreFromState(savedInstanceState);
+//        } else {
+//            initializeByIntent();
+//        }
+        //getDisplayInfo();
+
+        mSavedInstanceState = savedInstanceState;
+
+        if (!needRequestPermission()) {
+            init();
+        }
+    }
+
+    private void getDisplayInfo() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dpi = displayMetrics.densityDpi;
+        float density = displayMetrics.density;
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+        float scaledDensity = displayMetrics.scaledDensity;
+        Logger.d(TAG, "height: " + height + " width: " + width + " density: " +
+                density + " dpi: " + dpi + " scaledDensity: " + scaledDensity);
+    }
+
+    private void init() {
+        if (mSavedInstanceState != null) {
+            getStateManager().restoreFromState(mSavedInstanceState);
+        } else {
+            initializeByIntent();
+        }
+
+//        boolean ddmBulk = SystemProperties.getBoolean("persist.gallery.dualcam.ddmbulk", false);
+//        if(ddmBulk)
+//            startBulkMpoProcess();
+
+        mSavedInstanceState = null;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST: {
+                if (checkPermissionGrantResults(grantResults)) {
+                    Logger.d(TAG, "permission request ok !");
+                    init();
+                } else {
+                    Toast.makeText(this, R.string.denied_required_permission, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        }
+    }
+
+    private boolean needRequestPermission() {
+        boolean needRequest = false;
+        String[] permissions = {
+                Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                , Manifest.permission.READ_PHONE_STATE
+        };
+        ArrayList<String> permissionList = new ArrayList<String>();
+        for (String permission : permissions) {
+            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(permission);
+                needRequest = true;
+            }
+        }
+
+        if (needRequest) {
+            int count = permissionList.size();
+            if (count > 0) {
+                String[] permissionArray = new String[count];
+                for (int i = 0; i < count; i++) {
+                    permissionArray[i] = permissionList.get(i);
+                }
+                Logger.d(TAG, "need request permission: " + Arrays.toString(permissionArray));
+                requestPermissions(permissionArray, PERMISSION_REQUEST);
+            }
+        }
+        return needRequest;
+    }
+
+    private boolean checkPermissionGrantResults(int[] grantResults) {
+        for (int result : grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void initializeByIntent() {
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        if (Intent.ACTION_GET_CONTENT.equalsIgnoreCase(action)) {
+            Logger.d(TAG, "initializeByIntent - GET_CONTENT");
+            startGetContent(intent);
+        } else if (Intent.ACTION_PICK.equalsIgnoreCase(action)) {
+            // We do NOT really support the PICK intent. Handle it as
+            // the GET_CONTENT. However, we need to translate the type
+            // in the intent here.
+            Logger.d(TAG, "initializeByIntent - PICK");
+            String type = Utils.ensureNotNull(intent.getType());
+            if (type.startsWith("vnd.android.cursor.dir/")) {
+                if (type.endsWith("/image")) intent.setType("image/*");
+                if (type.endsWith("/video")) intent.setType("video/*");
+            }
+            startGetContent(intent);
+        } else if (Intent.ACTION_VIEW.equalsIgnoreCase(action) || ACTION_REVIEW.equalsIgnoreCase(action)) {
+            Logger.d(TAG, "initializeByIntent - VIEW or REVIEW");
+            startViewAction(intent);
+        } else {
+            //startTimelinePage();
+            //startDefaultPage();
+            startGalleryPage();
+            //startSelectionPage();
+            //startAlbumSettingPage();
+            //startEmptyPage();
+        }
+    }
+
+    public void startDefaultPage() {
+        PicasaSource.showSignInReminder(this);
+        Bundle data = new Bundle();
+        data.putString(AlbumSetPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_ALBUM_CUSTOM_ONLY));
+        getStateManager().startState(AlbumSetPage.class, data);
+        mVersionCheckDialog = PicasaSource.getVersionCheckDialog(this);
+        if (mVersionCheckDialog != null) {
+            mVersionCheckDialog.setOnCancelListener(this);
+        }
+    }
+
+    public void startEmptyPage() {
+        Bundle data = new Bundle();
+        data.putString(AlbumSetPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_ALL));
+        getStateManager().startState(EmptyPage.class, data);
+    }
+
+    public void startGalleryPage() {
+        Bundle bundle = new Bundle();
+        bundle.putString(TimeLinePage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_ALL));
+        bundle.putString(AlbumSetPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_ALBUM_CUSTOM_ONLY));
+        getStateManager().startState(GalleryPage.class, bundle);
+    }
+
+    private void startTimelinePage() {
+        Bundle data = new Bundle();
+        data.putString(TimeLinePage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_ALL));
+        if (getStateManager().getStateCount() == 0)
+            getStateManager().startState(TimeLinePage.class, data);
+        else {
+            ActivityState state = getStateManager().getTopState();
+            String oldClass = state.getClass().getSimpleName();
+            String newClass = TimeLinePage.class.getSimpleName();
+            if (!oldClass.equals(newClass)) {
+                getStateManager().switchState(getStateManager().getTopState(), TimeLinePage.class, data);
+            }
+        }
+        mVersionCheckDialog = PicasaSource.getVersionCheckDialog(this);
+        if (mVersionCheckDialog != null) {
+            mVersionCheckDialog.setOnCancelListener(this);
+        }
+    }
+
+    public void startSelectionPage() {
+        PicasaSource.showSignInReminder(this);
+        Bundle data = new Bundle();
+        data.putString(AlbumSelectionPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(DataManager.INCLUDE_SELECTION_ONLY));
+        data.putBoolean(AlbumSelectionPage.KEY_AUTO_SELECT_ALL, false);
+        getStateManager().startState(AlbumSelectionPage.class, data);
+    }
+
+    public void startAlbumSettingPage() {
+        Bundle data = new Bundle();
+        String mediaPath = getDataManager().getTopSetPath(DataManager.INCLUDE_SETTING_ONLY);
+        data.putString(AlbumSettingPage.KEY_MEDIA_PATH, mediaPath);
+        getStateManager().startState(AlbumSettingPage.class, data);
+    }
+
+    private void startGetContent(Intent intent) {
+        Bundle data = intent.getExtras() != null ? new Bundle(intent.getExtras()) : new Bundle();
+        data.putBoolean(KEY_GET_CONTENT, true);
+        int typeBits = GalleryUtils.determineTypeBits(this, intent);
+        data.putInt(KEY_TYPE_BITS, typeBits);
+
+        data.putString(TimeLinePage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(typeBits));
+        data.putString(AlbumSetPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(typeBits));
+        getStateManager().startState(GalleryPage.class, data);
+    }
+
+    private String getContentType(Intent intent) {
+        String type = intent.getType();
+        if (type != null) {
+            return GalleryUtils.MIME_TYPE_PANORAMA360.equals(type) ? MediaItem.MIME_TYPE_JPEG : type;
+        }
+
+        Uri uri = intent.getData();
+        try {
+            return getContentResolver().getType(uri);
+        } catch (Throwable t) {
+            Logger.w(TAG, "get type fail", t);
+            return null;
+        }
+    }
+
+    private void startViewAction(Intent intent) {
+        Boolean slideshow = intent.getBooleanExtra(EXTRA_SLIDESHOW, false);
+        if (slideshow) {
+            getActionBar().hide();
+            DataManager manager = getDataManager();
+            Path path = manager.findPathByUri(intent.getData(), intent.getType());
+            if (path == null || manager.getMediaObject(path) instanceof MediaItem) {
+                path = Path.fromString(manager.getTopSetPath(DataManager.INCLUDE_IMAGE));
+            }
+            Bundle data = new Bundle();
+            data.putString(SlideshowPage.KEY_SET_PATH, path.toString());
+            data.putBoolean(SlideshowPage.KEY_RANDOM_ORDER, true);
+            data.putBoolean(SlideshowPage.KEY_REPEAT, true);
+            if (intent.getBooleanExtra(EXTRA_DREAM, false)) {
+                data.putBoolean(SlideshowPage.KEY_DREAM, true);
+            }
+            getStateManager().startState(SlideshowPage.class, data);
+        } else {
+            Bundle data = new Bundle();
+            DataManager dm = getDataManager();
+            Uri uri = intent.getData();
+            String contentType = getContentType(intent);
+            if (contentType == null) {
+                Toast.makeText(this, R.string.no_such_item, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+            if (uri == null) {
+                int typeBits = GalleryUtils.determineTypeBits(this, intent);
+                data.putInt(KEY_TYPE_BITS, typeBits);
+                data.putString(AlbumSetPage.KEY_MEDIA_PATH, getDataManager().getTopSetPath(typeBits));
+                getStateManager().startState(AlbumSetPage.class, data);
+            } else if (contentType.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE)) {
+                int mediaType = intent.getIntExtra(KEY_MEDIA_TYPES, 0);
+                if (mediaType != 0) {
+                    uri = uri.buildUpon().appendQueryParameter(KEY_MEDIA_TYPES, String.valueOf(mediaType)).build();
+                }
+                Path setPath = dm.findPathByUri(uri, null);
+                MediaSet mediaSet = null;
+                if (setPath != null) {
+                    mediaSet = (MediaSet) dm.getMediaObject(setPath);
+                }
+                if (mediaSet != null) {
+                    if (mediaSet.isLeafAlbum()) {
+                        data.putString(AlbumPage.KEY_MEDIA_PATH, setPath.toString());
+                        data.putString(AlbumPage.KEY_PARENT_MEDIA_PATH, dm.getTopSetPath(DataManager.INCLUDE_ALL));
+                        getStateManager().startState(AlbumPage.class, data);
+                    } else {
+                        data.putString(AlbumSetPage.KEY_MEDIA_PATH, setPath.toString());
+                        getStateManager().startState(AlbumSetPage.class, data);
+                    }
+                } else {
+                    //startDefaultPage();
+                    startGalleryPage();
+                }
+            } else {
+                Path itemPath = dm.findPathByUri(uri, contentType);
+                Path albumPath = dm.getDefaultSetOf(itemPath);
+
+                data.putString(PhotoPage.KEY_MEDIA_ITEM_PATH, itemPath.toString());
+                boolean isFormCamera = intent.getBooleanExtra(PhotoPage.KEY_FROM_CAMERA, false);
+                data.putBoolean(PhotoPage.KEY_FROM_CAMERA, isFormCamera);
+                if (!isFormCamera) {
+                    data.putBoolean(PhotoPage.KEY_READONLY, true);
+                }
+
+                // TODO: Make the parameter "SingleItemOnly" public so other
+                //       activities can reference it.
+                boolean singleItemOnly = (albumPath == null) || intent.getBooleanExtra("SingleItemOnly", false);
+                if (!singleItemOnly) {
+                    data.putString(PhotoPage.KEY_MEDIA_SET_PATH, albumPath.toString());
+                    // when FLAG_ACTIVITY_NEW_TASK is set, (e.g. when intent is fired
+                    // from notification), back button should behave the same as up button
+                    // rather than taking users back to the home screen
+                    if (intent.getBooleanExtra(PhotoPage.KEY_TREAT_BACK_AS_UP, false)
+                            || ((intent.getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0)) {
+                        data.putBoolean(PhotoPage.KEY_TREAT_BACK_AS_UP, true);
+                    }
+                }
+                getStateManager().startState(SinglePhotoPage.class, data);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        //Utils.assertTrue(getStateManager().getStateCount() > 0); //Permission request
+        super.onResume();
+        if (mVersionCheckDialog != null) {
+            mVersionCheckDialog.show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mVersionCheckDialog != null) {
+            mVersionCheckDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        if (dialog == mVersionCheckDialog) {
+            mVersionCheckDialog = null;
+        }
+    }
+
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        final boolean isTouchPad = (event.getSource()
+                & InputDevice.SOURCE_CLASS_POSITION) != 0;
+        if (isTouchPad) {
+            float maxX = event.getDevice().getMotionRange(MotionEvent.AXIS_X).getMax();
+            float maxY = event.getDevice().getMotionRange(MotionEvent.AXIS_Y).getMax();
+            View decor = getWindow().getDecorView();
+            float scaleX = decor.getWidth() / maxX;
+            float scaleY = decor.getHeight() / maxY;
+            float x = event.getX() * scaleX;
+            //x = decor.getWidth() - x; // invert x
+            float y = event.getY() * scaleY;
+            //y = decor.getHeight() - y; // invert y
+            MotionEvent touchEvent = MotionEvent.obtain(event.getDownTime(),
+                    event.getEventTime(), event.getAction(), x, y, event.getMetaState());
+            return dispatchTouchEvent(touchEvent);
+        }
+        return super.onGenericMotionEvent(event);
+    }
+}

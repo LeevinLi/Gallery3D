@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <color name="status_bar_color">#000000</color>
+    <color name="actionbar_background">#FFFFFFFF</color>
+
+    <color name="default_background">#FFFFFFFF</color>
+
+    <!-- configuration for album set page -->
+    <color name="album_set_background">#FFFFFFFF</color>
+    <color name="album_set_placeholder">@color/album_set_background</color>
+    <color name="album_set_label_background">#77575757</color>
+    <color name="album_set_label_title">@color/album_set_background</color>
+    <color name="album_set_label_count">@color/album_set_background</color>
+
+    <!-- configuration for album selection page -->
+    <color name="album_selection_background">#FFFFFFFF</color>
+    <color name="album_selection_placeholder">@color/album_selection_background</color>
+    <color name="album_selection_label_background">#77575757</color>
+    <color name="album_selection_label_title">@color/album_selection_background</color>
+    <color name="album_selection_label_count">@color/album_selection_background</color>
+
+    <!-- configuration for album setting page -->
+    <color name="album_setting_background">#FFFFFFFF</color>
+    <color name="album_setting_placeholder">@color/album_setting_background</color>
+    <color name="album_setting_label_background">#77575757</color>
+    <color name="album_setting_label_title">@color/album_setting_background</color>
+    <color name="album_setting_label_count">@color/album_setting_background</color>
+
+    <!-- configuration for album page -->
+    <color name="album_background">#FFFFFFFF</color>
+    <color name="album_placeholder">@color/album_background</color>
+    <color name="album_label_background">@color/transparent</color>
+    <color name="album_label_time">#FBFBFB</color>
+
+    <!-- configuration for photo page -->
+    <color name="photo_background">#FFFFFFFF</color>
+    <color name="photo_placeholder">#333</color>
+
+    <!-- configuration for manage cache page -->
+    <color name="cache_background">#FFFFFFFF</color>
+    <color name="cache_placeholder">#333</color>
+    <color name="bitmap_screennail_placeholder">#333</color>
+    <color name="slideshow_background">#1A1A1A</color>
+    <color name="button_dark_transparent_background">#6000</color>
+    <color name="ingest_highlight_semitransparent">#8833b5e5</color>
+    <color name="ingest_date_tile_text">#33b5e5</color>
+
+    <!-- configuration for timeline cache page -->
+    <color name="timeline_background">#FFFFFFFF</color>
+    <color name="timeline_placeholder">@color/timeline_background</color>
+    <color name="highlight">#f41e26</color>
+    <color name="lowlight">#650101</color>
+    <color name="grey">#e7e7e7</color>
+    <color name="disabled_knob">#575757</color>
+    <color name="toolbar_theme">#e53935</color>
+    <color name="multiselect_background">#ffffff</color>
+    <color name="edit_background">#212121</color>
+    <color name="edit_actionbar_background">#000000</color>
+    <color name="dialog_button_color">#009688</color>
+    <color name="timeline_title_text_color">#757575</color>
+    <color name="timeline_title_number_text_color">#1a000000</color>
+    <color name="timeline_title_background_color">@color/default_background</color>
+    <color name="timeline_label_background">@color/transparent</color>
+    <color name="timeline_label_time">#FBFBFB</color>
+
+    <!-- other color -->
+    <color name="black">@android:color/black</color>
+    <color name="white">@android:color/white</color>
+    <color name="red_light">@android:color/holo_red_light</color>
+    <color name="transparent">@android:color/transparent</color>
+    <color name="empty_text_color">#9E9E9E</color>
+
+    <!--action bar-->
+    <color name="colorPrimary">#ffffffff</color>
+    <color name="colorPrimaryDark">#478cfe</color>
+
+    <!--selection manager-->
+    <color name="pressed_background">#AAF9F6F6</color>
+
+    <!-- Camera resources below -->
+    <color name="recording_time_elapsed_text">#FFFFFFFF</color>
+    <color name="recording_time_remaining_text">#FFFF0033</color>
+    <color name="on_viewfinder_label_background_color">#77333333</color>
+    <color name="review_control_pressed_color">#FF33B5E5</color>
+    <color name="review_control_pressed_fan_color">#3F33B5E5</color>
+    <color name="review_background">#FF000000</color>
+    <color name="icon_disabled_color">#DD777777</color>
+    <color name="time_lapse_arc">#FFC5C5C5</color>
+    <color name="indicator_background">#40000000</color>
+    <color name="popup_title_color">#ff33b5e5</color>
+    <color name="popup_background">#ff282828</color>
+    <color name="pano_progress_empty">#FF2E2E2E</color>
+    <color name="pano_progress_done">#FF33525E</color>
+    <color name="pano_progress_indication">#FF0099CC</color>
+    <color name="pano_progress_indication_fast">#FFFF2222</color>
+    <color name="mode_selection_border">#33B5E5</color>
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <color name="bright_foreground_disabled_holo_dark">#ff4c4c4c</color>
+    <color name="bright_foreground_holo_dark">#fff3f3f3</color>
+    <color name="face_detect_start">#80ffffff</color>
+    <color name="face_detect_success">#8050d060</color>
+    <color name="face_detect_fail">#80d05060</color>
+    <color name="gray">#FFAAAAAA</color>
+    <color name="effect_list_btn_bg">#FF419BF9</color>
+    <color name="filtershow_activity_bg">#FF0D0D0D</color>
+</resources>
